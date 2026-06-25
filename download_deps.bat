@@ -1,32 +1,32 @@
 @echo off
 setlocal enabledelayedexpansion
-title Pobieranie Zaleznosci NPU
+title NPU Dependencies Downloader
 
 echo ==========================================================
-echo    NPU Model Loader - Instalator Bibliotek
+echo    NPU Model Loader - Dependencies Installer
 echo ==========================================================
 echo.
-echo Pobieranie bibliotek C++ (ONNX Runtime, Vitis AI, ok. 1 GB)...
+echo Downloading C++ libraries (ONNX Runtime, Vitis AI, approx 1 GB)...
 
-:: Zmień poniższy link na link do pliku "deps.zip", 
-:: który wrzucisz w zakładce "Releases" na swoim własnym GitHubie!
+:: Change the link below to point to the "deps.zip" file
+:: that you will upload to the "Releases" tab on your own GitHub!
 set "DEPS_URL=https://github.com/TwojNick/NPU-Model-Loader/releases/download/v1.0/deps.zip"
 set "TARGET_DIR=%~dp0npu_chat"
 
 if not exist "%TARGET_DIR%\deps.zip" (
-    echo [1/2] Pobieranie pakietu zaleznosci...
+    echo [1/2] Downloading dependencies package...
     curl -L -o "%TARGET_DIR%\deps.zip" "%DEPS_URL%"
 ) else (
-    echo [1/2] Plik deps.zip juz istnieje.
+    echo [1/2] deps.zip already exists.
 )
 
-echo [2/2] Rozpakowywanie archiwum...
+echo [2/2] Extracting archive...
 powershell -Command "Expand-Archive -Path '%TARGET_DIR%\deps.zip' -DestinationPath '%TARGET_DIR%' -Force"
 
-echo Czyszczenie archiwum...
+echo Cleaning up archive...
 del "%TARGET_DIR%\deps.zip"
 
 echo.
-echo Gotowe! Biblioteki "libs" oraz "include" zostaly zainstalowane.
-echo Mozesz teraz skompilowac projekt.
+echo Done! The "libs" and "include" folders have been installed.
+echo You can now compile the project.
 pause

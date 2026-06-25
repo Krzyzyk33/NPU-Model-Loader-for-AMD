@@ -1,28 +1,28 @@
 import os
 from openai import OpenAI
 
-# Inicjalizacja oficjalnego klienta OpenAI, ale z przekierowaniem na nasz NPU Server
+# Initialize the official OpenAI client, but redirect it to our local NPU Server
 client = OpenAI(
-    api_key="brak",
+    api_key="none",
     base_url="http://127.0.0.1:8085/v1"
 )
 
-print("Wysyłam zapytanie do serwera NPU...\n")
+print("Sending request to the NPU Server...\n")
 
-# Wysyłamy zapytanie ze STREAMINGIEM (stream=True)
+# Send the request with STREAMING enabled (stream=True)
 response = client.chat.completions.create(
     model="npu-qwen-coder",
     messages=[
-        {"role": "system", "content": "Jesteś asystentem działającym na NPU AMD."},
-        {"role": "user", "content": "Napisz krótką funkcję w Pythonie odwracającą stringa."}
+        {"role": "system", "content": "You are a helpful AI assistant running on AMD NPU."},
+        {"role": "user", "content": "Write a short Python function to reverse a string."}
     ],
-    stream=True # Używamy nowo dodanego streamingu SSE!
+    stream=True # Use the newly added SSE streaming!
 )
 
-# Odbieramy chunk po chunku w czasie rzeczywistym
+# Receive chunk by chunk in real-time
 for chunk in response:
     content = chunk.choices[0].delta.content
     if content:
         print(content, end="", flush=True)
 
-print("\n\n[Zakończono streamowanie]")
+print("\n\n[Streaming finished]")

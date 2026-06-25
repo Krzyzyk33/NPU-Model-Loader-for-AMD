@@ -1,53 +1,71 @@
 # NPU Model Loader for AMD
 
-Ten projekt to ultra-szybki, lokalny serwer zgodny z API OpenAI, zaprojektowany specjalnie po to, by całkowicie przenieść inferencję modeli językowych (LLM) na procesor neuronowy **AMD NPU (XDNA)**. 
+This project is an ultra-fast, local server compatible with the OpenAI API, designed specifically to fully offload Large Language Model (LLM) inference to the **AMD NPU (XDNA) neural processor**.
 
-Dzięki bezpośredniemu wykorzystaniu NPU, zwalniasz zasoby CPU oraz zintegrowanej/dedykowanej karty graficznej. Całość generowania (prefill oraz decode) wykonywana jest bezpośrednio na koprocesorze, co pozwala oszczędzać energię i pracować w kompletnej ciszy.
+By utilizing the NPU directly, you free up your CPU and dedicated/integrated GPU resources. The entire generation process (both prefill and decoding) is executed natively on the coprocessor, saving energy and allowing you to run AI workloads in complete silence.
 
-## Wymagania Sprzętowe ("Czy to zadziała na moim procesorze?")
+## Hardware Requirements ("Will this work on my PC?")
 
-**TAK**, jeśli posiadasz procesor AMD Ryzen wyposażony w układ Ryzen AI NPU, z zainstalowanymi sterownikami NPU (oraz bibliotekami `Ryzen AI 1.7.1`).
+**YES**, provided you have an AMD Ryzen processor equipped with a Ryzen AI NPU.
 
-Działa bezbłędnie z:
-- **AMD Ryzen™ AI 300 Series (Strix Point)** - 50 TOPS, tutaj rozwija maksymalną prędkość (np. ponad 10 tokenów/s przy dekodowaniu i dziesiątki tysięcy t/s przy analizie).
+Works flawlessly with:
+- **AMD Ryzen™ AI 300 Series (Strix Point)** - 50 TOPS. Achieves maximum speed here (e.g. 10+ tokens/s decoding).
 - **AMD Ryzen™ 8040 Series (Hawk Point)** - 16 TOPS.
 - **AMD Ryzen™ 7040 Series (Phoenix)** - 10 TOPS.
 
-*Uwaga dla posiadaczy starszych serii (7040/8040)*: Może zaistnieć potrzeba użycia mniejszego modelu lub odpowiedniego dopasowania wersji ONNX ze względu na mniejszą ilość pamięci współdzielonej.
+*Note for older architectures (7040/8040)*: You might need to use a smaller model or adjust the ONNX format due to lower shared memory availability compared to Strix Point.
 
-## Instalacja i Uruchomienie
+## Prerequisites (What you need to run this app)
 
-Projekt to czysty kod źródłowy aplikacji (C++), aby użytkownik miał pełną kontrolę nad swoim środowiskiem bez zbędnych skryptów. 
+Before you begin, ensure you have the following installed on your Windows machine:
+1. **Windows 11** with the latest AMD NPU drivers.
+2. **Ryzen AI Software 1.7.1**: The official AMD libraries must be configured.
+3. **C++ Build Tools**: Visual Studio 2022/2026 Community with "Desktop development with C++" workload installed (needs MSVC and CMake).
+4. **Git** (optional, but recommended for cloning).
 
-1. Skompiluj projekt używając kompilatora obsługującego C++17 (np. MSVC) oraz CMake:
+## Installation and Setup
+
+This repository contains pure C++ source code to give you full control over your environment.
+
+1. **Download Dependencies**: Before compiling, you must download the official ONNX Runtime GenAI libraries for Ryzen AI. Run the included script:
+   ```cmd
+   download_deps.bat
+   ```
+   *(Note: The script downloads a `deps.zip` containing `libs` and `include` directories from the Releases page).*
+
+2. **Build the Project**: Compile the source code using a C++17 compatible compiler (e.g., MSVC) and CMake:
    ```cmd
    cd npu_chat
    mkdir build && cd build
    cmake .. -A x64
    cmake --build . --config Release
    ```
-2. Pobierz pożądany model NPU (np. `Qwen2.5-Coder-7B-4K`) w formacie ONNX z biblioteki HuggingFace do katalogu `models`.
-3. Uruchom serwer przekazując ścieżkę do modelu:
+
+3. **Get an NPU Model**: Download a compatible ONNX format model (e.g., `amd/Qwen2.5-Coder-7B-Instruct_rai_1.7.1_npu_4K`) from HuggingFace to the `models` directory.
+
+4. **Run the Server**: Start the local API server and provide the path to your downloaded model:
    ```cmd
    npu_chat.exe -m "..\..\..\models\Qwen2.5-Coder-7B-4K"
    ```
 
-W folderze `examples` znajdziesz proste skrypty integrujące nasz serwer z językami Python oraz Node.js z wykorzystaniem domyślnego pakietu `openai` i funkcji **streamingu na żywo**.
+## Integration and GUI Apps
 
-## Jak podłączyć do aplikacji GUI?
+The server perfectly emulates the OpenAI cloud. It is fully compatible with any modern local LLM interface (e.g., **AnythingLLM**, **SillyTavern**, **Chatbox**, **LM Studio UI**, or IDE extensions like **Continue.dev** in VSCode).
 
-Serwer zachowuje się identycznie jak chmura OpenAI, więc jest kompatybilny z każdą nowoczesną aplikacją do obsługi lokalnych LLM (np. **AnythingLLM**, **SillyTavern**, **Chatbox**, **LM Studio UI**, czy różnego rodzaju wtyczki do programowania jak **Continue.dev** w VSCode).
-
-### Instrukcja dla dowolnego UI:
-1. Upewnij się, że okno z `start_server.bat` jest uruchomione i serwer nasłuchuje.
-2. W ustawieniach swojej aplikacji odszukaj sekcję **AI Providers** lub **Connections**.
-3. Wybierz typ: `OpenAI API` (lub `Custom OpenAI`, `Local OpenAI`).
-4. Jako **Base URL** (lub API Endpoint) wpisz:
+### Setup for any UI App:
+1. Ensure the `npu_chat.exe` server is running.
+2. Go to your application's **AI Providers** or **Connections** settings.
+3. Select the type: `OpenAI API` (or `Custom OpenAI`, `Local OpenAI`).
+4. Enter the **Base URL** (API Endpoint):
    ```text
    http://127.0.0.1:8085/v1
    ```
-5. Pole na API Key (hasło) możesz zostawić puste lub wpisać cokolwiek (np. `brak`), ponieważ nasz serwer go nie wymaga.
-6. Ciesz się inferencją 100% zasilaną Twoim NPU!
+5. Leave the API Key empty or enter anything (e.g., `none`), as this local server does not require authentication.
+6. Enjoy 100% NPU-powered inference!
+
+## Examples
+
+In the `examples` folder, you will find simple integration scripts for **Python** and **Node.js**. They demonstrate how to use the official `openai` SDK with **live streaming (Server-Sent Events)** to communicate with your NPU!
 
 ---
-Stworzone w ramach walki o perfekcyjne oprogramowanie na NPU. Licencja MIT.
+Created as part of the quest for perfect NPU software. MIT License.

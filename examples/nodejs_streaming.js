@@ -1,26 +1,26 @@
 const { OpenAI } = require('openai');
 
-// Inicjalizacja oficjalnego klienta OpenAI z przekierowaniem na nasz lokalny NPU Server
+// Initialize the official OpenAI client, redirecting it to our local NPU Server
 const openai = new OpenAI({
-  apiKey: 'brak',
+  apiKey: 'none',
   baseURL: 'http://127.0.0.1:8085/v1',
 });
 
 async function main() {
-  console.log("Połączono z serwerem NPU. Czekam na pierwsze tokeny (streaming)...\n");
+  console.log("Connected to the NPU Server. Waiting for first tokens (streaming)...\n");
 
   const stream = await openai.chat.completions.create({
     model: 'npu-model',
-    messages: [{ role: 'user', content: 'Wymień 3 popularne języki programowania i opisz każdy w 1 zdaniu.' }],
+    messages: [{ role: 'user', content: 'List 3 popular programming languages and describe each in 1 sentence.' }],
     stream: true,
   });
 
-  // Wypisujemy tokeny na ekran w czasie rzeczywistym
+  // Print tokens to the console in real-time
   for await (const chunk of stream) {
     process.stdout.write(chunk.choices[0]?.delta?.content || '');
   }
   
-  console.log("\n\n[Zakończono streamowanie]");
+  console.log("\n\n[Streaming finished]");
 }
 
 main();
