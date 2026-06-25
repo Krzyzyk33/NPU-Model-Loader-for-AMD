@@ -9,8 +9,7 @@ echo.
 echo Downloading C++ libraries (ONNX Runtime, Vitis AI, approx 1 GB)...
 
 :: Change the link below to point to the "deps.zip" file
-:: that you will upload to the "Releases" tab on your own GitHub!
-set "DEPS_URL=https://github.com/TwojNick/NPU-Model-Loader/releases/download/v1.0/deps.zip"
+set "DEPS_URL=https://github.com/Krzyzyk33/NPU-Model-Loader-for-AMD/releases/download/v1.0/deps.zip"
 set "TARGET_DIR=%~dp0npu_chat"
 
 if not exist "%TARGET_DIR%\deps.zip" (
